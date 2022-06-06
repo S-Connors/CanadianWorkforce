@@ -3,3 +3,4 @@ pandas
 plotly
 dash_bootstrap_components
 json
+gunicorn
