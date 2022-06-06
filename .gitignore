@@ -1,0 +1,8 @@
+# ignore everything in virtual environment
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# ignore big files
+statcanada.csv
