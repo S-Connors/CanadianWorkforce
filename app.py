@@ -61,11 +61,17 @@ px.set_mapbox_access_token(token)
 
 # Themes for bootstrap
 # https://www.bootstrapcdn.com/bootswatch/
-app = Dash(__name__, external_stylesheets=[dbc.themes.MINTY],
-            # Meta_taga allows to resize for phone
-            meta_tags=[{'name': 'viewport',
-                        'content': 'width=device-width, initial-scale=1.0'}]
-            )
+app = Dash(__name__,
+    external_stylesheets=[dbc.themes.MINTY],
+    # Meta_taga allows to resize for phone
+    meta_tags=[
+        {'name': 'viewport',
+        'content': 'width=device-width, initial-scale=1.0'}
+        ]
+    )
+
+#declare your server for gunicorn to find
+server = app.server
 
 # Layout section: Bootstrap (https://hackerthemes.com/bootstrap-cheatsheet/)
 app.layout = dbc.Container([
@@ -313,4 +319,4 @@ def update_map(job,age,year,prov,labour):
     return fig, fig2
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    server.run(debug=True)
