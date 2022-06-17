@@ -8,10 +8,9 @@ import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 
 
-# css stlye cheatsheet
-# https://codepen.io/onediv/pen/oyQdJz
 
 #-------------------------------------------------------------------------------
+
 # Add the DataFrame
 geojson = json.load(open('georef-canada-province.geojson'))
 
@@ -74,7 +73,6 @@ app.layout = dbc.Container([
         dbc.Col(
             html.H1('Canadian Job Market',
             className = 'text-center text-info mb-4'),
-#            width = 12
         xs=12, sm=12, md=12, lg=12, xl=12),
     ]),
 
@@ -144,14 +142,14 @@ app.layout = dbc.Container([
                     ],
                     multi=False,
                     value='Total, all industries',
-        #            placeholder='Select an industry'
+
                 ),
             width=3),
 
             dbc.Col(
                 dcc.Dropdown(
                     id='sclt_age',
-                    value = '15 years and over',
+                    value = '25 to 54 years',
                     options=[{'label':x, 'value':x}
                             for x in sorted(df['Age group'].unique())]
                 ),
@@ -180,7 +178,7 @@ app.layout = dbc.Container([
                 dcc.Dropdown(
                     id='sclt_labour',
                     options=[
-                        {'label':'Unemployed', 'value':'Unemployed'},
+                        {'label':'Unemployed', 'value':'Unemployment'},
                         {'label':'Part-time employment', 'value':'Part-time employment'},
                         {'label':'Full-time employment', 'value':'Full-time employment'}],
                     multi=False,
@@ -243,7 +241,6 @@ app.layout = dbc.Container([
     ],className="h-75")
 
 ], fluid=True)
-#, style ={"background-color": "black"})
 
 #-------------------------------------------------------------------------------
 # Callback
@@ -261,8 +258,6 @@ app.layout = dbc.Container([
 def update_map(job,age,year,prov,labour):
     print([job, year, age, labour])
     print(type([job, year, age, labour]))
-
-#    container = f'Job:{job}  year:{year} age:{age} prov:{prov} labour:{labour}'
 
     dff = df.copy()
     dff = dff[dff["REF_DATE"] == year]
@@ -282,7 +277,6 @@ def update_map(job,age,year,prov,labour):
         featureidkey="properties.prov_name_en",
         locations='GEO',
         color='Percent_F',
-#        mapbox_style="open-street-map",
         opacity=0.5,
         color_continuous_scale=[
             [0, 'rgb(2, 10, 250)'],# bottom of scale
@@ -312,16 +306,11 @@ def update_map(job,age,year,prov,labour):
         color_continuous_scale = [[0 ,'rgb(2, 10, 250)'], [1,'rgb(250, 2, 163)']],
         color='Percent_F',
         facet_col_spacing = 0,
-        # height = 700,
-        # width = '25%',
-        orientation = 'h'
-        # range_x=[1976, 2021],
-        #range_y = [0,100]
+        orientation = 'h',
+        range_x = [0,100]
     )
 
     return fig, fig2
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-    #ADD PYCHARM TO ATOM
