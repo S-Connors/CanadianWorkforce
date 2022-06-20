@@ -51,7 +51,39 @@ df['Percent_F'] = df['Percent_F'].round(2)
 # new col male percent
 df['Percent_M'] = df['value_m'] / df['Total']
 df["Percent_M"] = df["Percent_M"] * 100
-df['Percent_F'] = df['Percent_F'].round(2)
+df['Percent_M'] = df['Percent_M'].round(2)
+
+# adding sex back in
+ff = df.copy()
+ff = ff[['REF_DATE','GEO','Labour force characteristics',
+        'North American Industry Classification System (NAICS)',
+        'value_F','Age group','Percent_F','Total']]
+ff['Sex'] = 'Female'
+
+# creating one spot for ALL values
+ff['Value'] = ff['value_F']
+ff.drop('value_F', axis = 'columns', inplace=True)
+
+# making one col for percent while keeping female % its own
+ff['Percent'] = ff['Percent_F']
+
+# adding sex back in
+dd = df.copy()
+dd = dd[['REF_DATE','GEO','Labour force characteristics',
+        'North American Industry Classification System (NAICS)',
+        'value_m','Age group','Percent_M','Total']]
+dd['Sex'] = 'Male'
+
+# creating one spot for ALL values
+dd['Value'] = dd['value_m']
+dd.drop('value_m', axis = 'columns', inplace=True)
+
+# making one col for percent
+dd['Percent'] = dd['Percent_M']
+dd.drop('Percent_M', axis = 'columns', inplace=True)
+
+# make into one df
+df = ff.merge(dd, how = 'outer')
 
 # add token for themes
 token = 'pk.eyJ1Ijoic3RlcGg0NzMyIiwiYSI6ImNsM3ZteDdzdjJtZWEzaW9leXVuejB4djYifQ.WIadkBsq3np49mTByYvSTw'
@@ -77,9 +109,51 @@ server = app.server
 app.layout = dbc.Container([
     dbc.Row([
         dbc.Col(
-            html.H1('Canadian Job Market',
-            className = 'text-center text-info mb-4'),
+            html.Div(
+                'Canadian Workforce',
+                style = {
+                    'textAlign': 'center',
+                    'color': '#383838',
+                    'fontSize': 35,
+                    'font-family':'Arial Black'
+                    }
+                ),
         xs=12, sm=12, md=12, lg=12, xl=12),
+    ]),
+
+    dbc.Row([
+        dbc.Col(
+            html.Div(
+                '''Explore the history of Canadian women in the
+                workforce through the data collected by Statistics Canada.''',
+                style={
+                    'textAlign': 'center',
+                    'color': '#636262',
+                    'fontSize': 22
+                    }
+            ),
+        xs=12, sm=12, md=12, lg=12, xl=12
+        ),
+    ]),
+
+    dbc.Row([
+        dbc.Col(
+            html.Div('''Industries are sorted by the North American Industry Classification
+                System (NAICS).''',
+                style={
+                    'textAlign': 'center',
+                    'color' : 'grey',
+                    'fontSize' : 19
+                }
+            ),
+        xs=12, sm=12, md=12, lg=12, xl=12
+        ),
+    ]),
+
+    dbc.Row([
+        dbc.Col(
+            html.Br()
+        )
     ]),
 
     dbc.Row([
@@ -246,6 +320,17 @@ app.layout = dbc.Container([
         xs=12, sm=12, md=12, lg=8, xl=8),
     ],className="h-75")
 
+
+    # dcc.Markdown('''
+    #     >
+    #     >Any society that fails to harness the energy and creativity of its
+    #     >women is at a huge disadvantage in the modern world.
+    #     >
+    #     Tian Wei
+    # '''),
+
+
+
 ], fluid=True)
 
 #-------------------------------------------------------------------------------
@@ -276,6 +361,7 @@ def update_map(job,age,year,prov,labour):
     df3 = df3[df3['GEO'] == prov]
     df3 = df3[df3['Labour force characteristics'] == labour]
 
+# https://plotly.github.io/plotly.py-docs/generated/plotly.express.choropleth_mapbox.html
 
     fig = px.choropleth_mapbox(
         dff,
@@ -295,25 +381,37 @@ def update_map(job,age,year,prov,labour):
         zoom= 2.5,
         color_continuous_midpoint=50,
         range_color=[100,0],
-        mapbox_style='light'
+        mapbox_style='light',
+        title = f'''The percentage of females in industry by province in {year}'''
 
     )
     fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    fig.update_layout(autosize=True)
+#    fig.update_layout(margin={"r":2,"t":2,"l":2,"b":2})
+
+# https://plotly.com/python-api-reference/generated/plotly.express.bar
 
     fig2 = px.bar(
         df3,
-        x ='Percent_F',
+        x ='Percent',
         y = 'REF_DATE',
-        hover_data=['Percent_F', 'REF_DATE','Age group',
+        hover_data=['REF_DATE','Age group',
             'North American Industry Classification System (NAICS)','GEO',
             'Labour force characteristics'],
-        labels= {'Percent_F':'% of females', 'REF_DATE':'Year'},
-        color_continuous_scale = [[0 ,'rgb(2, 10, 250)'], [1,'rgb(250, 2, 163)']],
-        color='Percent_F',
+        labels= {'REF_DATE':'Year ',
+                'Sex': 'Sex ',
+                'Percent':'Percent ',
+                'North American Industry Classification System (NAICS)': 'NAICS ',
+                'REF_DATE':'Year ',
+                'Labour force characteristics':'Employment ',
+                'GEO':'Province ',
+                'Age group': 'Age group '},
+        color_discrete_map = {'Male':'rgb(15, 105, 250)', 'Female':'rgb(247, 87, 226)'},
+        color='Sex',
         facet_col_spacing = 0,
         orientation = 'h',
-        range_x = [0,100]
+        range_x = [0,100],
+        title = f'Male vs Female in {prov}'
     )
 
     return fig, fig2
