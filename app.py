@@ -354,6 +354,7 @@ def update_map(job,age,year,prov,labour):
     dff = dff[dff["REF_DATE"] == year]
     dff = dff[dff['Age group'] == age]
     dff = dff[dff['North American Industry Classification System (NAICS)']==job]
+    dff = dff[dff['Labour force characteristics'] == labour]
 
     df3 = df.copy()
     df3 = df3[df3['Age group'] == age]
@@ -376,7 +377,22 @@ def update_map(job,age,year,prov,labour):
             [1, 'rgb(250, 2, 163)']],# Top of scale
 
         template='seaborn',
-        labels = {'Percent_F':'% of Females'},
+        labels = {
+            'Percent_F':'Percent of Females ',
+            'REF_DATE':'Year ',
+            'Sex': 'Sex ',
+            'Percent':'Percent ',
+            'North American Industry Classification System (NAICS)': 'NAICS ',
+            'REF_DATE':'Year ',
+            'Labour force characteristics':'Employment type ',
+            'GEO':'Province ',
+            'Age group': 'Age group '},
+        hover_data = [
+            'REF_DATE',
+            'Age group',
+            'North American Industry Classification System (NAICS)',
+            'GEO',
+            'Labour force characteristics'],
         center = {'lat':54.1304, 'lon':-97.3468},
         zoom= 2.5,
         color_continuous_midpoint=50,
@@ -395,18 +411,24 @@ def update_map(job,age,year,prov,labour):
         df3,
         x ='Percent',
         y = 'REF_DATE',
-        hover_data=['REF_DATE','Age group',
-            'North American Industry Classification System (NAICS)','GEO',
+        hover_data=[
+            'REF_DATE',
+            'Age group',
+            'North American Industry Classification System (NAICS)',
+            'GEO',
             'Labour force characteristics'],
-        labels= {'REF_DATE':'Year ',
-                'Sex': 'Sex ',
-                'Percent':'Percent ',
-                'North American Industry Classification System (NAICS)': 'NAICS ',
-                'REF_DATE':'Year ',
-                'Labour force characteristics':'Employment ',
-                'GEO':'Province ',
-                'Age group': 'Age group '},
-        color_discrete_map = {'Male':'rgb(15, 105, 250)', 'Female':'rgb(247, 87, 226)'},
+        labels= {
+            'REF_DATE':'Year ',
+            'Sex': 'Sex ',
+            'Percent':'Percent ',
+            'North American Industry Classification System (NAICS)': 'NAICS ',
+            'REF_DATE':'Year ',
+            'Labour force characteristics':'Employment type ',
+            'GEO':'Province ',
+            'Age group': 'Age group '},
+        color_discrete_map = {
+            'Male':'rgb(15, 105, 250)',
+            'Female':'rgb(247, 87, 226)'},
         color='Sex',
         facet_col_spacing = 0,
         orientation = 'h',
